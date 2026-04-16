@@ -1,10 +1,9 @@
-# 🏥 Disease Predictor & Risk Analysis
+# Disease Predictor & Risk Analysis
 ### Final Year Computer Science Project
 **Tech Stack:** Python · Streamlit · Scikit-learn · Logistic Regression
 
 ---
-
-## 📋 Project Overview
+## Project Overview
 A web-based multi-disease prediction system that uses **Logistic Regression** (a supervised machine learning algorithm) to predict the risk of:
 - 🩸 **Diabetes** (based on blood glucose, BMI, age, etc.)
 - ❤️ **Heart Disease** (based on cholesterol, ECG, chest pain type, etc.)
@@ -12,7 +11,7 @@ A web-based multi-disease prediction system that uses **Logistic Regression** (a
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 ```
 disease_predictor/
 ├── app.py              ← Main Streamlit web application
@@ -27,7 +26,7 @@ disease_predictor/
 
 ---
 
-## ⚙️ How to Run (Step-by-Step)
+## How to Run (Step-by-Step)
 
 ### Step 1 – Install Python
 Make sure Python 3.8+ is installed. Download from: https://www.python.org
@@ -52,8 +51,7 @@ The app will open in your browser at `http://localhost:8501`
 
 ---
 
-## 🧠 How It Works (For Viva)
-
+## How It Works
 ### Machine Learning Algorithm: Logistic Regression
 - **Type:** Supervised Classification Algorithm
 - **Output:** Probability (0 to 1) of having the disease
@@ -78,7 +76,7 @@ Risk Classification: LOW / MODERATE / HIGH
 
 ---
 
-## 📊 Model Accuracy
+## Model Accuracy
 | Disease | Accuracy |
 |---------|----------|
 | Diabetes | ~70% |
@@ -87,7 +85,7 @@ Risk Classification: LOW / MODERATE / HIGH
 
 ---
 
-## 💡 Key Features
+## Key Features
 - Multi-disease prediction in one app
 - Clean, professional web UI
 - Real-time risk percentage with color-coded bar
@@ -97,7 +95,7 @@ Risk Classification: LOW / MODERATE / HIGH
 
 ---
 
-## 🔬 Future Improvements (for report)
+## Future Improvements (for report)
 - Use real datasets (UCI, Kaggle)
 - Add Random Forest / SVM for better accuracy
 - Add patient history tracking with database
