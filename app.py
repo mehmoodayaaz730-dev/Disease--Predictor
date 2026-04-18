@@ -10,6 +10,57 @@ import numpy as np
 import pickle
 import os
 
+# ─── Auto-train models if not found (needed for cloud deployment) ──────────────
+def ensure_models():
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+
+    os.makedirs("models", exist_ok=True)
+
+    def save_model(name, X, y):
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        scaler = StandardScaler()
+        X_train_s = scaler.fit_transform(X_train)
+        model = LogisticRegression(max_iter=1000, random_state=42)
+        model.fit(X_train_s, y_train)
+        pickle.dump((model, scaler), open(f"models/{name}_model.pkl", "wb"))
+
+    if not os.path.exists("models/diabetes_model.pkl"):
+        np.random.seed(42); n = 800
+        X = np.column_stack([np.random.randint(0,17,n), np.random.normal(120,30,n).clip(50,200),
+            np.random.normal(70,12,n).clip(40,120), np.random.normal(25,10,n).clip(0,60),
+            np.random.normal(80,100,n).clip(0,500), np.random.normal(32,7,n).clip(18,60),
+            np.random.exponential(0.5,n).clip(0.08,2.5), np.random.randint(21,81,n).astype(float)])
+        prob = 1/(1+np.exp(-(-8+0.04*X[:,1]+0.07*X[:,5]+0.02*X[:,7]+0.3*X[:,6])))
+        y = (np.random.rand(n) < prob).astype(int)
+        save_model("diabetes", X, y)
+
+    if not os.path.exists("models/heart_model.pkl"):
+        np.random.seed(7); n = 800
+        X = np.column_stack([np.random.randint(29,78,n).astype(float), np.random.randint(0,2,n).astype(float),
+            np.random.randint(0,4,n).astype(float), np.random.normal(130,20,n).clip(90,200),
+            np.random.normal(245,50,n).clip(120,400), np.random.randint(0,2,n).astype(float),
+            np.random.randint(0,3,n).astype(float), np.random.normal(150,22,n).clip(70,210),
+            np.random.randint(0,2,n).astype(float), np.random.exponential(1.0,n).clip(0,6.2),
+            np.random.randint(0,3,n).astype(float), np.random.randint(0,4,n).astype(float),
+            np.random.randint(0,3,n).astype(float)])
+        prob = 1/(1+np.exp(-(-5+0.04*X[:,0]+0.5*X[:,2]+0.01*X[:,4]-0.02*X[:,7]+0.6*X[:,8]+0.3*X[:,9]+0.4*X[:,11])))
+        y = (np.random.rand(n) < prob).astype(int)
+        save_model("heart", X, y)
+
+    if not os.path.exists("models/liver_model.pkl"):
+        np.random.seed(13); n = 800
+        X = np.column_stack([np.random.randint(4,90,n).astype(float), np.random.randint(0,2,n).astype(float),
+            np.random.exponential(1.5,n).clip(0.4,30), np.random.exponential(0.5,n).clip(0.1,15),
+            np.random.normal(220,120,n).clip(60,800), np.random.exponential(30,n).clip(7,700),
+            np.random.exponential(35,n).clip(10,800), np.random.normal(6.5,1.0,n).clip(2.7,9.6),
+            np.random.normal(3.2,0.6,n).clip(0.9,5.5), np.random.normal(1.0,0.3,n).clip(0.3,2.8)])
+        prob = 1/(1+np.exp(-(-3+0.02*X[:,0]+0.15*X[:,2]+0.003*X[:,4]+0.002*X[:,5]+0.001*X[:,6]-0.3*X[:,9])))
+        y = (np.random.rand(n) < prob).astype(int)
+        save_model("liver", X, y)
+
+ensure_models()
 # ─── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Disease Predictor & Risk Analysis",
@@ -114,12 +165,14 @@ st.markdown("""
 # ─── Load Models ───────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_models():
-    base = os.path.dirname(__file__)
     models = {}
     for name in ["diabetes", "heart", "liver"]:
-        path = os.path.join(base, "models", f"{name}_model.pkl")
-        if os.path.exists(path):
-            models[name] = pickle.load(open(path, "rb"))
+        # Try relative path first (cloud), then absolute (local)
+        for base in [".", os.path.dirname(os.path.abspath(__file__))]:
+            path = os.path.join(base, "models", f"{name}_model.pkl")
+            if os.path.exists(path):
+                models[name] = pickle.load(open(path, "rb"))
+                break
     return models
 
 models = load_models()
